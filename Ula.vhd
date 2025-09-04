@@ -166,39 +166,12 @@ begin
                     Over <= '0';
                 end if;
 
-            when "111" => -- shift left lógico de A por B posições
-                case B is
-                    when "0000" => -- Shift 0 posições
-                        Operations_temp <= std_logic_vector(A);
-                        
-                    when "0001" => -- Shift 1 posição
-                        Operations_temp <= std_logic_vector(A(2 downto 0)) & '0';
-                        -- Verifica carry (bit perdido)
-                        if A(3) = '1' then
-                            Carry <= '1';
-                        end if;
-                        
-                    when "0010" => -- Shift 2 posições  
-                        Operations_temp <= std_logic_vector(A(1 downto 0)) & "00";
-                        -- Verifica carry (bits perdidos)
-                        if A(3) = '1' or A(2) = '1' then
-                            Carry <= '1';
-                        end if;
-                        
-                    when "0011" => -- Shift 3 posições
-                        Operations_temp <= A(0) & "000";
-                        -- Verifica carry (bits perdidos)
-                        if A(3) = '1' or A(2) = '1' or A(1) = '1' then
-                            Carry <= '1';
-                        end if;
-                        
-                    when others => -- Shift >= 4 posições, resultado é 0
-                        Operations_temp <= "0000";
-                        -- Se A não era zero, houve carry
-                        if std_logic_vector(A) /= "0000" then
-                            Carry <= '1';
-                        end if;
-                end case;
+            when "111" => -- shift left lógico de A
+                temp := resize(A, 5) + resize(A, 5);
+                operations_temp <= std_logic_vector(temp(3 downto 0));
+                Carry <= temp(4);
+                Over <= (A(3)and not A(2)) or
+                       (not A(3) and A(2));
 
             when others =>
                 Operations_temp <= "0000";
